@@ -1,0 +1,125 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css">
+    <script src="chroma.min.js"></script>
+</head>
+
+<body>
+    <H3>Change of CO2 over time - demo by slow transition</H3>
+    <canvas id="myCanvas" width="400" height="400"></canvas>
+    <script>
+        var canvas = document.getElementById('myCanvas').getContext('2d');
+        
+        var duration = 5; //duration for the animation
+        var range = 1500;
+        
+        //color scale corresponding to CO2 measurement scales
+        var scale = chroma.scale(['#008000', '#14540d', '#132c0d', '#000000', '#52170b', '#a51b0b', '#ff0000']);
+
+        //measurement points
+        var start_m = [896, 550];
+        var end_m = [356, 200];
+
+        //point of measurements in the floor plan
+        var left_por = [80, 230];
+        var right_por = [275, 280];
+
+        //at the start of animation
+        //at Left point - start gradient from color code for start measurement at Left Point  
+        //at Right point - start gradient from color code for strat measurement at Right Point
+        var startToneLeft = canvas.createRadialGradient(left_por[0], left_por[1], 1, left_por[0], left_por[1], 260); //left POR  
+        startToneLeft.addColorStop(0, scale(start_m[0] / range).hex());
+        startToneLeft.addColorStop(1, 'rgba(130,70,60,0)');
+        
+
+        var startToneRight = canvas.createRadialGradient(right_por[0], right_por[1], 1, right_por[0], right_por[1], 100); //right POR  
+        startToneRight.addColorStop(0, scale(start_m[1] / range).hex());
+        startToneRight.addColorStop(1, 'rgba(85,125,75,0)');
+
+        //by end of animation
+        //at Left point - start gradient from color code for end measurement at Left Point  
+        //at Right point - start gradient from color code for end measurement at Right Point
+        var endToneLeft = canvas.createRadialGradient(left_por[0], left_por[1], 1, left_por[0], left_por[1], 260); //left POR
+        endToneLeft.addColorStop(0, scale(end_m[0] / range).hex());
+        endToneLeft.addColorStop(1, 'rgba(43,167,30,0)');
+       
+
+        var endToneRight = canvas.createRadialGradient(left_por[0], left_por[1], 1, right_por[0], right_por[1], 100); //right POR 
+        endToneRight.addColorStop(0, scale(end_m[1] / range).hex());
+        endToneRight.addColorStop(1, 'rgba(36,192,25,0)');
+
+
+
+        //opacity is incremented from 0.0 to 1.0 periodically over the duration of animation
+        //number of opacity steps = fps * duration.
+        var numOfSteps = parseInt(60 * duration);
+        // set the currentStep to 0
+        var currentStep = 0;
+
+        // start the animation by calling the first frame
+        requestAnimationFrame(drawShape);
+
+
+        function drawShape() {
+
+            // calculate opacity for current step as a percentage of currentStep/numOfSteps
+            var opacity = (currentStep / numOfSteps);
+
+            //console.log("step"+currentStep + " opacity:" + opacity);
+
+            //set opacity to 100% for last step
+            if (currentStep == numOfSteps) {
+                opacity = 1;
+            }
+
+            //draw on canvas
+            canvas.beginPath();
+            canvas.moveTo(50, 100);
+            canvas.lineTo(100, 100);
+            canvas.lineTo(100, 50);
+            canvas.lineTo(275, 50);
+            canvas.lineTo(275, 250);
+            canvas.lineTo(325, 250);
+            canvas.lineTo(325, 350);
+            canvas.lineTo(200, 350);
+            canvas.lineTo(200, 275);
+            canvas.lineTo(50, 275);
+            canvas.lineTo(50, 97);
+
+
+            // fill hot colors by decrasing opacity as we go 
+            // this increases the transparancy with each step making cold colors more significant 
+            canvas.globalAlpha = (1 - opacity);
+            //console.log(canvas.globalAlpha + " is the startTone globalAlpha");
+            canvas.fillStyle = startToneRight;
+            canvas.fill();
+            canvas.fillStyle = startToneLeft;
+            canvas.fill();
+            canvas.lineWidth = 5;
+            canvas.strokeStyle = 'black';
+            canvas.stroke();
+
+            // fill cool colors by increasing opacity as we go
+            // this decreases the transparancy with each step making cold colors more significatnt 
+            canvas.globalAlpha = opacity;
+            //console.log(canvas.globalAlpha + " is the coolTone globalAlpha");
+            canvas.fillStyle = endToneRight;
+            canvas.fill();
+            canvas.fillStyle = endToneLeft;
+            canvas.fill();
+            canvas.lineWidth = 5;
+            canvas.strokeStyle = 'black';
+            canvas.stroke();
+
+            if (currentStep++ < numOfSteps) {
+                requestAnimationFrame(drawShape);
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>

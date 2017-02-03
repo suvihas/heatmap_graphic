@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <H3>Change of temperature over time - demo by slow transition</H3>
+    <canvas id="myCanvas" width="400" height="400"></canvas>
+    <script>
+        var canvas = document.getElementById('myCanvas').getContext('2d');
+
+        var hotColors = ["#ff0000", "#f9b1a2", "#ffbb91", "#ffff00"];
+        var coolColors = ["#2170ef", "#bfe8ff", "#c1ffef", "#8effe2"];
+
+        var colorStops = 2;
+        var duration = 4; //duration for the animation
+
+        if (colorStops == 4) {
+
+            var coolTone = canvas.createRadialGradient(80, 230, 25, 125, 200, 250); //4color stops
+            //var coolTone = canvas.createRadialGradient(80, 230, 50, 125, 100, 250); //4color stops    
+            var hotTone = canvas.createRadialGradient(80, 230, 25, 125, 200, 250); //4color stops  
+            //var hotTone = canvas.createRadialGradient(80, 230, 50, 125, 100, 250);  //4color stops  
+
+            coolTone.addColorStop(0, coolColors[0]); // Darkblue
+            coolTone.addColorStop(0.4, coolColors[1]); //Lightblue
+            coolTone.addColorStop(0.45, coolColors[2]); //Light green
+            coolTone.addColorStop(1, coolColors[3]); //Green
+
+            hotTone.addColorStop(0, hotColors[0]); // Red
+            hotTone.addColorStop(0.4, hotColors[1]); //Light Red
+            hotTone.addColorStop(0.45, hotColors[2]); //Light Orange
+            hotTone.addColorStop(1, hotColors[3]); //Yellow
+
+        } else {
+
+            var coolTone = canvas.createRadialGradient(80, 230, 40, 150, 120, 200); //2color stops  
+            var hotTone = canvas.createRadialGradient(80, 230, 40, 150, 120, 200); //2color stops  
+
+            coolTone.addColorStop(0, coolColors[0]); //dark blue
+            coolTone.addColorStop(1, coolColors[3]); //green
+
+            hotTone.addColorStop(0, hotColors[0]); //red
+            hotTone.addColorStop(1, hotColors[3]); //yellow
+        }
+
+        //opacity is incremented from 0.0 to 1.0 periodically over the duration of animation
+        //number of opacity steps = fps * duration.
+        var numOfSteps = parseInt(60 * duration);
+        // set the currentStep to 0
+        var currentStep = 0;
+
+        // start the animation by calling the first frame
+        requestAnimationFrame(drawShape);
+
+
+        function drawShape() {
+
+            // calculate opacity for current step as a percentage of currentStep/numOfSteps
+            var opacity = (currentStep / numOfSteps);
+
+            //console.log("step"+currentStep + " opacity:" + opacity);
+
+            //set opacity to 100% for last step
+            if (currentStep == numOfSteps) {
+                opacity = 1;
+            }
+
+            //draw on canvas
+            canvas.beginPath();
+            canvas.moveTo(50, 100);
+            canvas.lineTo(100, 100);
+            canvas.lineTo(100, 50);
+            canvas.lineTo(275, 50);
+            canvas.lineTo(275, 250);
+            canvas.lineTo(325, 250);
+            canvas.lineTo(325, 350);
+            canvas.lineTo(200, 350);
+            canvas.lineTo(200, 275);
+            canvas.lineTo(50, 275);
+            canvas.lineTo(50, 97);
+
+
+            // fill hot colors by decrasing opacity as we go 
+            // this increases the transparancy with each step making cold colors more significant 
+            canvas.globalAlpha = (1 - opacity);
+            //console.log(canvas.globalAlpha + " is the hotTone globalAlpha");
+            canvas.fillStyle = hotTone;
+            canvas.fill();
+            canvas.lineWidth = 5;
+            canvas.strokeStyle = 'black';
+            canvas.stroke();
+
+            // fill cool colors by increasing opacity as we go
+            // this decreases the transparancy with each step making cold colors more significatnt 
+            canvas.globalAlpha = opacity;
+            //console.log(canvas.globalAlpha + " is the coolTone globalAlpha");
+            canvas.fillStyle = coolTone;
+            canvas.fill();
+            canvas.lineWidth = 5;
+            canvas.strokeStyle = 'black';
+            canvas.stroke();
+
+            if (currentStep++ < numOfSteps) {
+                requestAnimationFrame(drawShape);
+            }
+        }
+    </script>
+
+</body>
+
+</html>
